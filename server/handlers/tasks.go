@@ -76,22 +76,22 @@ func (h *HandlerTasks) ListTasks(c *fiber.Ctx) error {
 	service := taskservice.NewService(h.Server.DB)
 	err := service.ReadAllTask(&tasks)
 	if err != nil {
-		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to create task.")
+		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to read all task.")
 	}
 
 	return responses.NewResponseTasks(c, fiber.StatusOK, tasks)
 }
 
 // Refresh godoc
-// @Summary List tasks
+// @Summary Get task
 // @Tags Tasks
 // @Accept json
 // @Produce json
 // @Param id path string true "ID"
-// @Success 200 {object} []responses.ResponseTask
+// @Success 200 {object} responses.ResponseTask
 // @Failure 500 {object} responses.Error
 // @Router /tasks/{id} [get]
-func (h *HandlerTasks) GetTasks(c *fiber.Ctx) error {
+func (h *HandlerTasks) GetTask(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return responses.ErrorResponse(c, fiber.StatusBadRequest, "Task uuid is invalid.")
@@ -102,7 +102,52 @@ func (h *HandlerTasks) GetTasks(c *fiber.Ctx) error {
 	service := taskservice.NewService(h.Server.DB)
 	err = service.ReadTaskByID(id, &task)
 	if err != nil {
-		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to create task.")
+		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to read task.")
+	}
+
+	return responses.NewResponseTask(c, fiber.StatusOK, task)
+}
+
+// Refresh godoc
+// @Summary Update task
+// @Tags Tasks
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Param params body requests.RequestTask true "Task Request"
+// @Success 200 {object} []responses.ResponseTask
+// @Failure 500 {object} responses.Error
+// @Router /tasks/{id} [put]
+func (h *HandlerTasks) UpdateTask(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusBadRequest, "Task uuid is invalid.")
+	}
+
+	request := requests.RequestTask{}
+	err = json.Unmarshal(c.Body(), &request)
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusBadRequest, "Task request data is invalid.")
+	}
+
+	task := models.Task{}
+
+	service := taskservice.NewService(h.Server.DB)
+	err = service.ReadTaskByID(id, &task)
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to read task.")
+	}
+
+	now := time.Now()
+
+	task.UpdatedAt = &now
+	task.Title = request.Title
+	task.Description = request.Description
+	task.Status = request.Status
+
+	err = service.UpdateTask(&task)
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to update task.")
 	}
 
 	return responses.NewResponseTask(c, fiber.StatusOK, task)
