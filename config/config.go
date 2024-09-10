@@ -12,6 +12,7 @@ type Config struct {
 	PostgresUser     string
 	PostgresPassword string
 	PostgresDb       string
+	ServerPort       string
 }
 
 func NewConfig() *Config {
@@ -24,11 +25,15 @@ func (config *Config) LoadEnvironment() error {
 		return err
 	}
 
+	// Postgres configuration
 	config.PostgresHost = os.Getenv("POSTGRES_HOST")
 	config.PostgresPort = os.Getenv("POSTGRES_PORT")
 	config.PostgresUser = os.Getenv("POSTGRES_USER")
 	config.PostgresPassword = os.Getenv("POSTGRES_PASSWORD")
 	config.PostgresDb = os.Getenv("POSTGRES_DB")
+
+	// Server configuration
+	config.ServerPort = os.Getenv("SERVER_PORT")
 
 	return nil
 }
