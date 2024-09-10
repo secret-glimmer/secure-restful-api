@@ -8,7 +8,7 @@ import (
 
 func (service *Service) ReadTaskByID(id uuid.UUID, task *models.Task) error {
 	return service.DB.
-		Find(task, id).
+		First(task, id).
 		Error
 }
 

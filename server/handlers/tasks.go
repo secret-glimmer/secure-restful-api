@@ -50,7 +50,6 @@ func (h *HandlerTasks) CreateTask(c *fiber.Ctx) error {
 		Status:      request.Status,
 		CreatedAt:   &now,
 		UpdatedAt:   &now,
-		DeletedAt:   nil,
 	}
 
 	service := taskservice.NewService(h.Server.DB)
@@ -89,6 +88,8 @@ func (h *HandlerTasks) ListTasks(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path string true "ID"
 // @Success 200 {object} responses.ResponseTask
+// @Failure 400 {object} responses.Error
+// @Failure 404 {object} responses.Error
 // @Failure 500 {object} responses.Error
 // @Router /tasks/{id} [get]
 func (h *HandlerTasks) GetTask(c *fiber.Ctx) error {
@@ -102,7 +103,7 @@ func (h *HandlerTasks) GetTask(c *fiber.Ctx) error {
 	service := taskservice.NewService(h.Server.DB)
 	err = service.ReadTaskByID(id, &task)
 	if err != nil {
-		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to read task.")
+		return responses.ErrorResponse(c, fiber.StatusNotFound, "There is no task has that id.")
 	}
 
 	return responses.NewResponseTask(c, fiber.StatusOK, task)
@@ -116,6 +117,8 @@ func (h *HandlerTasks) GetTask(c *fiber.Ctx) error {
 // @Param id path string true "ID"
 // @Param params body requests.RequestTask true "Task Request"
 // @Success 200 {object} []responses.ResponseTask
+// @Failure 400 {object} responses.Error
+// @Failure 404 {object} responses.Error
 // @Failure 500 {object} responses.Error
 // @Router /tasks/{id} [put]
 func (h *HandlerTasks) UpdateTask(c *fiber.Ctx) error {
@@ -135,7 +138,7 @@ func (h *HandlerTasks) UpdateTask(c *fiber.Ctx) error {
 	service := taskservice.NewService(h.Server.DB)
 	err = service.ReadTaskByID(id, &task)
 	if err != nil {
-		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to read task.")
+		return responses.ErrorResponse(c, fiber.StatusNotFound, "There is no task has that id.")
 	}
 
 	now := time.Now()
@@ -148,6 +151,39 @@ func (h *HandlerTasks) UpdateTask(c *fiber.Ctx) error {
 	err = service.UpdateTask(&task)
 	if err != nil {
 		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to update task.")
+	}
+
+	return responses.NewResponseTask(c, fiber.StatusOK, task)
+}
+
+// Refresh godoc
+// @Summary Delete task
+// @Tags Tasks
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Success 200 {object} responses.Data
+// @Failure 400 {object} responses.Error
+// @Failure 404 {object} responses.Error
+// @Failure 500 {object} responses.Error
+// @Router /tasks/{id} [delete]
+func (h *HandlerTasks) DeleteTask(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusBadRequest, "Task uuid is invalid.")
+	}
+
+	task := models.Task{}
+
+	service := taskservice.NewService(h.Server.DB)
+	err = service.ReadTaskByID(id, &task)
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusNotFound, "There is no task has that id.")
+	}
+
+	err = service.DeleteTask(id, &task)
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete task.")
 	}
 
 	return responses.NewResponseTask(c, fiber.StatusOK, task)
