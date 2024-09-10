@@ -3,6 +3,7 @@ package server
 import (
 	"secure-api/config"
 	"secure-api/db"
+	"secure-api/models"
 
 	_ "secure-api/docs"
 
@@ -23,6 +24,8 @@ func NewServer(config *config.Config) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	db.AutoMigrate(&models.Task{})
 
 	return &Server{
 		App:    app,
