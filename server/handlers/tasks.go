@@ -6,7 +6,7 @@ import (
 	"secure-api/requests"
 	"secure-api/responses"
 	s "secure-api/server"
-	"secure-api/services/tasks"
+	taskservice "secure-api/services/tasks"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -43,7 +43,7 @@ func (h *HandlerTasks) CreateTask(c *fiber.Ctx) error {
 
 	now := time.Now()
 
-	task := models.Tasks{
+	task := models.Task{
 		ID:          uuid.New(),
 		Title:       request.Title,
 		Description: request.Description,
@@ -53,11 +53,31 @@ func (h *HandlerTasks) CreateTask(c *fiber.Ctx) error {
 		DeletedAt:   nil,
 	}
 
-	service := tasks.NewService(h.Server.DB)
+	service := taskservice.NewService(h.Server.DB)
 	err = service.CreateTask(&task)
 	if err != nil {
 		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to create task.")
 	}
 
 	return responses.MessageResponse(c, fiber.StatusOK, "Task is successfully created.")
+}
+
+// Refresh godoc
+// @Summary List tasks
+// @Tags Tasks
+// @Accept json
+// @Produce json
+// @Success 200 {object} []responses.ResponseTask
+// @Failure 500 {object} responses.Error
+// @Router /tasks [get]
+func (h *HandlerTasks) ListTasks(c *fiber.Ctx) error {
+	tasks := []models.Task{}
+
+	service := taskservice.NewService(h.Server.DB)
+	err := service.ReadAllTask(&tasks)
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to create task.")
+	}
+
+	return responses.NewResponseTasks(c, fiber.StatusOK, tasks)
 }

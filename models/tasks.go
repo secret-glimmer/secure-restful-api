@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Tasks struct {
+type Task struct {
 	ID          uuid.UUID
 	Title       string
 	Description string
