@@ -81,3 +81,29 @@ func (h *HandlerTasks) ListTasks(c *fiber.Ctx) error {
 
 	return responses.NewResponseTasks(c, fiber.StatusOK, tasks)
 }
+
+// Refresh godoc
+// @Summary List tasks
+// @Tags Tasks
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Success 200 {object} []responses.ResponseTask
+// @Failure 500 {object} responses.Error
+// @Router /tasks/{id} [get]
+func (h *HandlerTasks) GetTasks(c *fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusBadRequest, "Task uuid is invalid.")
+	}
+
+	task := models.Task{}
+
+	service := taskservice.NewService(h.Server.DB)
+	err = service.ReadTaskByID(id, &task)
+	if err != nil {
+		return responses.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to create task.")
+	}
+
+	return responses.NewResponseTask(c, fiber.StatusOK, task)
+}

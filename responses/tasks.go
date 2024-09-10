@@ -33,3 +33,14 @@ func NewResponseTasks(c *fiber.Ctx, statusCode int, tasks []models.Task) error {
 
 	return Response(c, statusCode, responses)
 }
+
+func NewResponseTask(c *fiber.Ctx, statusCode int, task models.Task) error {
+	return Response(c, statusCode, ResponseTask{
+		ID:          task.ID,
+		Title:       task.Title,
+		Description: task.Description,
+		Status:      task.Status,
+		CreatedAt:   task.CreatedAt,
+		UpdatedAt:   task.UpdatedAt,
+	})
+}
