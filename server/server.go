@@ -4,6 +4,8 @@ import (
 	"secure-api/config"
 	"secure-api/db"
 
+	_ "secure-api/docs"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
