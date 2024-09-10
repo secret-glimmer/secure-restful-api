@@ -20,4 +20,6 @@ func GroupTasks(server *server.Server, group fiber.Router) {
 
 	group.Post("", handler.CreateTask)
 	group.Get("", handler.ListTasks)
+	group.Get("/:id", handler.GetTask)
+	group.Put("/:id", handler.UpdateTask)
 }
