@@ -3,8 +3,7 @@ package main
 import (
 	"log"
 	"secure-api/config"
-	"secure-api/db"
-	"secure-api/models"
+	"secure-api/server"
 )
 
 func main() {
@@ -14,6 +13,10 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	db := db.Init(config)
-	db.AutoMigrate(&models.Tasks{})
+	server, err := server.NewServer(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	server.Listen()
 }

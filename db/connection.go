@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func Init(config *cfg.Config) *gorm.DB {
+func Init(config *cfg.Config) (*gorm.DB, error) {
 	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.PostgresHost,
 		config.PostgresPort,
@@ -23,8 +23,8 @@ func Init(config *cfg.Config) *gorm.DB {
 	})
 
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
-	return db
+	return db, nil
 }
