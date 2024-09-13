@@ -34,5 +34,40 @@ You are required to build a RESTful API for a simple task management application
 - README file with setup instructions, explanations, and any assumptions made.
 - API documentation (Swagger or similar).
 
+## Run Application
+## Run Application
+1. Install docker.
+2. Copy `backend/.env.example` and rename it to `.env`.
+3. Start docker container.
+
+    ```bash
+    make up
+    ```
+
+    If it doesn't work, use this command.
+
+    ```bash
+    docker compose up
+    ```
+
+4. Stop docker container.
+
+    ```bash
+    make down
+    ```
+
+    If it doesn't work, use this comand
+
+    ```bash
+    docker compose down
+    ```
+5. You can see swagger documentation at this url.
+
+    <http://127.0.0.1:8000/docs/index.html>
+
+6. You can get OAuth2.0 access token from this url.
+
+    <http://127.0.0.1:8000/docs/index.html>
+
 ### Note:
 If you make assumptions, please note them down in documentation.
