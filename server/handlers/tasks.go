@@ -116,6 +116,7 @@ func (h *HandlerTasks) GetTask(c *fiber.Ctx) error {
 // @Tags Tasks
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "ID"
 // @Param params body requests.RequestTask true "Task Request"
 // @Success 200 {object} []responses.ResponseTask
@@ -163,6 +164,7 @@ func (h *HandlerTasks) UpdateTask(c *fiber.Ctx) error {
 // @Tags Tasks
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "ID"
 // @Success 200 {object} responses.Data
 // @Failure 400 {object} responses.Error
