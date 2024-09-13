@@ -9,7 +9,12 @@ import (
 
 // @Title Secure REST API
 // @Version 1.0
-// @description This is a Secure REST API written in GO.
+// @Description This is a Secure REST API written in GO.
+// @SecurityDefinitions.apikey ApiKeyAuth
+// @Type apiKey
+// @In header
+// @Name Authorization
+
 func main() {
 	config := config.NewConfig()
 	err := config.LoadEnvironment()

@@ -1,21 +1,26 @@
 package routes
 
 import (
-	"secure-api/server"
+	s "secure-api/server"
 	"secure-api/server/handlers"
+	"secure-api/server/middlewares"
 
 	"github.com/gofiber/fiber/v2"
 	swagger "github.com/swaggo/fiber-swagger"
 )
 
-func ConfigureRoutes(server *server.Server) {
+func ConfigureRoutes(server *s.Server) {
 	server.App.Get("/docs/*", swagger.WrapHandler)
 
 	groupTasks := server.App.Group("/tasks")
+	groupTasks.Use(middlewares.AuthMiddleware)
 	GroupTasks(server, groupTasks)
+
+	groupAuth := server.App.Group("/auth")
+	GroupAuth(server, groupAuth)
 }
 
-func GroupTasks(server *server.Server, group fiber.Router) {
+func GroupTasks(server *s.Server, group fiber.Router) {
 	handler := handlers.NewHandlerTasks(server)
 
 	group.Post("", handler.CreateTask)
@@ -23,4 +28,11 @@ func GroupTasks(server *server.Server, group fiber.Router) {
 	group.Get("/:id", handler.GetTask)
 	group.Put("/:id", handler.UpdateTask)
 	group.Delete("/:id", handler.DeleteTask)
+}
+
+func GroupAuth(server *s.Server, group fiber.Router) {
+	handler := handlers.NewHandlerAuth(server)
+
+	group.Get("/login", handler.Login)
+	group.Get("/callback", handler.Callback)
 }
